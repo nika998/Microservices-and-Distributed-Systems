@@ -1,7 +1,9 @@
-package com.nikolascode.customer;
+package com.amigoscode.customer;
 
 import com.amigoscode.clients.fraud.FraudCheckResponse;
 import com.amigoscode.clients.fraud.FraudClient;
+import com.amigoscode.clients.notification.NotificationClient;
+import com.amigoscode.clients.notification.NotificationRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -11,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 public class CustomerService{
 
     private final CustomerRepository customerRepository;
-    private final RestTemplate restTemplate;
+    private final NotificationClient notificationClient;
     private final FraudClient fraudClient;
 
     public void registerCustomer(CustomerRegistrationRequest request) {
@@ -28,7 +30,14 @@ public class CustomerService{
             throw new IllegalStateException("fraudster");
         }
 
-        // todo: send notification
+        notificationClient.sendNotification(
+                new NotificationRequest(
+                        customer.getId(),
+                        customer.getEmail(),
+                        String.format("Hi %s, welcome to Amigoscode...",
+                                customer.getFirstName())
+                )
+        );
 
 
     }
